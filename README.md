@@ -29,11 +29,11 @@ Elle s'ouvre en fenêtre par-dessus la fiche du personnage, depuis le coin « Cr
   (données par un PNJ, par exemple).
 - Le Maquillage et l'Œuvrerie partagent les pigments. Les couleurs, leurs mélanges, leurs effets de
   maquillage et les émotions des œuvres viennent de l'**Index des couleurs** d'Eraser. Une teinte se
-  découvre en la créant ; son effet se débloque à part, par le joueur, quand le MJ le lui dit.
+  découvre en la créant ; son effet reste caché derrière l'œil, comme dans l'inventaire, jusqu'à ce que le joueur le montre.
 
 ## Comment l'extension se branche sur Eraser
 
-- C'est une extension de l'**API 4** d'Eraser : un module de démarrage (`boot`, `activate(eraser)`) qui pose
+- C'est une extension de l'**API 5** d'Eraser : un module de démarrage (`boot`, `activate(eraser)`) qui pose
   le coin Craft dans l'emplacement `inventaire.bourse` et sa roue de réglages dans
   `administration.extension`, puis ouvre ses fenêtres avec `eraser.ui.dialog`.
 - Elle lit et modifie l'inventaire **uniquement par les API d'Eraser** (`eraser.eraser("/api/…")`), qui
@@ -41,7 +41,7 @@ Elle s'ouvre en fenêtre par-dessus la fiche du personnage, depuis le coin « Cr
   Google elle-même : sa partie serveur lit les index par `eraser.indexes`, et n'en sert aux joueurs
   que les colonnes réglées.
 - Ses propres données (réglages, carnets, créations en cours) sont gardées sur le serveur partagé, dans
-  la portée `extension:craft`. Les effets débloqués sont ceux d'Eraser, partagés avec l'inventaire.
+  la portée `extension:craft`. L'effet d'un item est caché d'office derrière l'œil de l'inventaire : le montrer dans un atelier le montre aussi dans l'inventaire, et l'inverse.
 - Une création se fait en deux temps : d'abord le nouvel item, ensuite le retrait des items utilisés
   (avec la quantité vue : rien n'est retiré à tort si l'inventaire a changé). Une note « création en
   cours » permet de terminer ou d'oublier proprement si Eraser se ferme au milieu.

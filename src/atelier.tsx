@@ -1,6 +1,6 @@
 /**
  * Ce que chaque atelier charge en s'ouvrant (inventaire, réglages, catalogue de son index, effets
- * cachés, carnet, création pas terminée), et la fin d'une création : ranger ailleurs, terminer
+ * montrés, carnet, création pas terminée), et la fin d'une création : ranger ailleurs, terminer
  * une création interrompue.
  */
 import { useEffect, useState } from "react"
@@ -11,7 +11,7 @@ import type { Eraser } from "@/lib/extension-api"
 import type { CharacterInventoryRecord, InventoryTransferTarget } from "@/lib/inventory-schema"
 
 import type { PendingCreation, Recipe } from "./book"
-import { forgetPending, loadCatalog, loadEffects, loadInventory, loadPending, loadSettings, removeTakes, serverJson, setEffectUnlocked, transfer, transferTargets, type EffectVisibility } from "./inventory"
+import { forgetPending, showEffect, type OwnedItem, loadCatalog, loadInventory, loadPending, loadSettings, removeTakes, serverJson, transfer, transferTargets } from "./inventory"
 import type { Atelier, AtelierCatalog, CraftSettings } from "./settings"
 import { Notice, colors } from "./ui"
 import { cn } from "@/lib/utils"
@@ -20,7 +20,6 @@ export type AtelierData<R extends Recipe> = {
   inventory: CharacterInventoryRecord
   settings: CraftSettings
   catalog: AtelierCatalog
-  effects: EffectVisibility
   book: R[]
   pending: PendingCreation | null
 }
@@ -34,11 +33,10 @@ export function useAtelier<R extends Recipe>(eraser: Eraser, characterId: string
       loadInventory(eraser, characterId),
       loadSettings(eraser),
       loadCatalog(eraser, atelier),
-      loadEffects(eraser, characterId),
       serverJson<{ book: R[] }>(eraser, `carnet/${atelier}/${encodeURIComponent(characterId)}`).then((result) => result.book),
       loadPending(eraser, characterId).catch(() => null),
-    ]).then(([inventory, settings, catalog, effects, book, pending]) => {
-      if (alive) setData({ inventory, settings, catalog, effects, book, pending })
+    ]).then(([inventory, settings, catalog, book, pending]) => {
+      if (alive) setData({ inventory, settings, catalog, book, pending })
     }).catch((reason: unknown) => {
       if (alive) setError(reason instanceof Error ? reason.message : "L'atelier n'a pas pu s'ouvrir.")
     })
@@ -54,18 +52,14 @@ export function useAtelier<R extends Recipe>(eraser: Eraser, characterId: string
     }
   }
 
-  const toggleEffect = async (name: string, hidden: boolean) => {
-    try {
-      const unlocked = await setEffectUnlocked(eraser, characterId, name, hidden)
-      setData((current) => current ? { ...current, effects: { ...current.effects, unlocked } } : current)
-      // La fiche relit son inventaire : l'effet s'y montre (ou s'y cache) aussi.
-      eraser.inventory?.changed(characterId)
-    } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "L'effet n'a pas pu être changé.")
-    }
+  // L'œil des effets : le même état que l'inventaire ; `shownVersion` redessine l'atelier.
+  const [shownVersion, setShownVersion] = useState(0)
+  const toggleEffect = (owned: OwnedItem, shown: boolean) => {
+    showEffect(eraser, owned, shown)
+    setShownVersion((current) => current + 1)
   }
 
-  return { data, setData, error, setError, saveBook, toggleEffect }
+  return { data, setData, error, setError, saveBook, toggleEffect, shownVersion }
 }
 
 /** Pendant le chargement, ou s'il a échoué. */

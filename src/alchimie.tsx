@@ -2,7 +2,7 @@
  * L'Alchimie : une base, un ou plusieurs ingrédients d'alchimie et un récipient donnent un
  * consommable. La base décide de sa famille (potion, venin, onguent, gaz), le récipient de ses
  * doses (chacune se consomme d'un clic dans l'inventaire). Un ingrédient posé deux fois compte
- * deux fois. Les effets des ingrédients suivent les effets cachés d'Eraser.
+ * deux fois. L'effet d'un ingrédient est caché d'office, derrière l'œil de l'inventaire.
  *
  * Le test se lance à la table : le joueur dit ce qu'il a obtenu.
  *   Réussite : la formule. Échec : chaque ingrédient a 75 % de chances de ne pas compter.
@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils"
 
 import { AtelierLoading, Destination, PendingBanner, useAtelier } from "./atelier"
 import { newRecipeId, type AlchimieRecipe } from "./book"
-import { craft, effectHidden, effectLines, effectLockable, hasType, numberIn, ownedItems, plannedTakes, type OwnedItem } from "./inventory"
+import { craft, effectHidden, effectLines, hasType, numberIn, ownedItems, plannedTakes, type OwnedItem } from "./inventory"
 import { META, fold, type AtelierCatalog } from "./settings"
 import { BookStrip, EffectList, ItemIcon, ItemRow, ItemTip, Label, LockMenu, Notice, OutcomeAsk, Segmented, colors, type EffectLine, type OutcomeKey } from "./ui"
 
@@ -78,7 +78,7 @@ export function AlchimieWindow({ eraser, characterId }: ExtensionDialogProps<{ c
   const [notice, setNotice] = useState("")
 
   if (!data) return <AtelierLoading error={error} />
-  const { settings: { alchimie: settings }, catalog, effects } = data
+  const { settings: { alchimie: settings }, catalog } = data
   const owned = ownedItems(data.inventory)
   const brew = mode === "brew"
 
@@ -101,9 +101,9 @@ export function AlchimieWindow({ eraser, characterId }: ExtensionDialogProps<{ c
   const potShown = pot ? shownOf(pot, owned, catalog) : null
   const family = familyFor(base)
   const doses = dosesFor(pot)
-  const hiddenFor = (item: Shown) => effectHidden(effects, item)
+  const hiddenFor = (item: Shown) => effectHidden(eraser, item.owned)
 
-  // Chaque ingrédient compte autant de fois qu'il est posé ; verrouillé : une ligne « Effet inconnu ».
+  // Chaque ingrédient compte autant de fois qu'il est posé ; caché : une ligne « Effet inconnu ».
   const fxOf = (keys: string[]): EffectLine[] => [...new Set(keys)].flatMap((key) => {
     const item = shownOf(key, owned, catalog)
     if (!item?.owned) return []
@@ -215,7 +215,7 @@ export function AlchimieWindow({ eraser, characterId }: ExtensionDialogProps<{ c
       return <ItemTip title={item.name} lines={[`×${dosesFor(item.key)} dose${dosesFor(item.key) > 1 ? "s" : ""}`]}>{children}</ItemTip>
     }
     const hidden = hiddenFor(item)
-    return <LockMenu name={item.name} lockable={Boolean(item.owned) && effectLockable(effects, item)} hidden={hidden} onToggle={() => toggleEffect(item.name, hidden)}>
+    return <LockMenu name={item.name} lockable={Boolean(item.owned)} hidden={hidden} onToggle={() => { if (item.owned) toggleEffect(item.owned, hidden) }}>
       <ItemTip title={item.name} effect={item.owned ? effectLines(item.owned.item) : undefined} locked={hidden}>{children}</ItemTip>
     </LockMenu>
   }

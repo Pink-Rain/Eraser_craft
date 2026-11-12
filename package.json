@@ -1,11 +1,11 @@
 {
   "name": "eraser-craft",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Eraser Craft : les ateliers de fabrication des personnages d'Eraser (Cuisine, Alchimie…), publiés comme extension.",
   "eraserExtension": {
     "id": "craft",
-    "api": 4,
+    "api": 5,
     "boot": "boot.js",
     "globalStyles": [
       "craft.css"

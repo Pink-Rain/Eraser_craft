@@ -1,5 +1,5 @@
 /**
- * Le démarrage de l'extension (API 4) : le coin « Craft » à côté de la bourse de chaque
+ * Le démarrage de l'extension (API 5) : le coin « Craft » à côté de la bourse de chaque
  * personnage, et la roue de réglages sur sa ligne d'Administration › Extensions. Les fenêtres
  * des ateliers s'ouvrent avec `eraser.ui.dialog`, le cadre de fenêtre d'Eraser.
  */

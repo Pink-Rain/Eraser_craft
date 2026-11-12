@@ -100,39 +100,20 @@ export async function serverJson<T>(eraser: Eraser, path: string, init?: { metho
   return readJson<T>(await eraser.server(path, init ? { method: init.method, headers: { "content-type": "application/json" }, body: init.body === undefined ? undefined : JSON.stringify(init.body) } : undefined))
 }
 
-/* ---------- les effets cachés (Eraser, partagés avec l'inventaire) ---------- */
+/* ---------- l'œil des effets (le même que dans l'inventaire) ---------- */
 
-export type EffectVisibility = { hiddenTypes: string[]; unlocked: string[] }
-
-export async function loadEffects(eraser: Eraser, characterId: string): Promise<EffectVisibility> {
-  const response = await eraser.eraser(`/api/characters/${encodeURIComponent(characterId)}/effects`)
-  // Un Eraser sans effets cachés : tout se voit.
-  if (response.status === 404) return { hiddenTypes: [], unlocked: [] }
-  const data = await readJson<Partial<EffectVisibility>>(response)
-  return { hiddenTypes: data.hiddenTypes ?? [], unlocked: data.unlocked ?? [] }
+/**
+ * L'effet d'un item est caché d'office, comme dans l'inventaire : il se voit quand le joueur l'a
+ * montré par l'œil (dans l'inventaire ou dans l'atelier), pour l'une de ses cases.
+ */
+export function effectHidden(eraser: Eraser, owned: OwnedItem | null) {
+  if (!owned) return true
+  return !owned.slots.some(({ slot }) => eraser.inventory.effectShown(slot.id))
 }
 
-/** Débloque (ou reverrouille) l'effet d'un item pour ce personnage ; rend ses noms débloqués. */
-export async function setEffectUnlocked(eraser: Eraser, characterId: string, item: string, unlocked: boolean): Promise<string[]> {
-  const data = await readJson<{ unlocked?: string[] }>(await eraser.eraser(`/api/characters/${encodeURIComponent(characterId)}/effects`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ item, unlocked }),
-  }))
-  return data.unlocked ?? []
-}
-
-/** L'effet de cet item est-il caché pour ce personnage ? */
-export function effectHidden(visibility: EffectVisibility, item: { name: string; type: string }) {
-  const type = fold(item.type || "")
-  if (!type || !visibility.hiddenTypes.some((hidden) => fold(hidden) === type)) return false
-  return !visibility.unlocked.some((name) => fold(name) === fold(item.name))
-}
-
-/** Un effet qu'on peut verrouiller (son type est caché d'office). */
-export function effectLockable(visibility: EffectVisibility, item: { type: string }) {
-  const type = fold(item.type || "")
-  return Boolean(type) && visibility.hiddenTypes.some((hidden) => fold(hidden) === type)
+/** Montre ou cache l'effet d'un item, pour toutes ses cases (l'œil de l'inventaire suit). */
+export function showEffect(eraser: Eraser, owned: OwnedItem, shown: boolean) {
+  eraser.inventory.showEffects(owned.slots.map(({ slot }) => slot.id), shown)
 }
 
 /* ---------- créer, retirer, ranger ailleurs ---------- */

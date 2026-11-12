@@ -2,7 +2,7 @@
  * La Cuisine : des ingrédients (crus ou cuits) et un contenant, ou aucun, donnent un plat. Chaque
  * portion du plat rend toute sa Nutrition à la barre de rassasiement, d'un clic dans l'inventaire.
  * La conservation est écrite dans l'effet du contenant ; le contenant s'ajoute au recyclage du plat.
- * Les effets des ingrédients suivent les effets cachés d'Eraser (débloqués au clic droit).
+ * L'effet d'un ingrédient est caché d'office, derrière l'œil de l'inventaire (clic droit : le voir).
  *
  * Le test se lance à la table : le joueur dit ce qu'il a obtenu.
  *   Réussite : le plat. Échec : Nutrition ÷ 2, arrondie en dessous.
@@ -17,7 +17,7 @@ import type { ExtensionDialogProps } from "@/lib/extension-api"
 
 import { AtelierLoading, Destination, PendingBanner, useAtelier } from "./atelier"
 import { newRecipeId, type CuisineRecipe } from "./book"
-import { CraftError, craft, effectHidden, effectLines, effectLockable, hasType, numberIn, ownedItems, plannedTakes, type OwnedItem } from "./inventory"
+import { CraftError, craft, effectHidden, effectLines, hasType, numberIn, ownedItems, plannedTakes, type OwnedItem } from "./inventory"
 import { META, fold, type AtelierCatalog } from "./settings"
 import { BookStrip, EffectList, ItemIcon, ItemRow, ItemTip, Label, LockMenu, Notice, OutcomeAsk, Segmented, colors, type EffectLine, type OutcomeKey } from "./ui"
 
@@ -52,7 +52,7 @@ export function CuisineWindow({ eraser, characterId }: ExtensionDialogProps<{ ch
   const [notice, setNotice] = useState("")
 
   if (!data) return <AtelierLoading error={error} />
-  const { settings: { cuisine: settings }, catalog, effects } = data
+  const { settings: { cuisine: settings }, catalog } = data
   const owned = ownedItems(data.inventory)
   const cook = mode === "cook"
   const isIngredientType = (type: string) => hasType({ type }, settings.ingredientTypes)
@@ -82,8 +82,8 @@ export function CuisineWindow({ eraser, characterId }: ExtensionDialogProps<{ ch
   const potShown = pot ? shownOf(pot, owned, catalog) : null
   const potEffect = potShown?.owned ? effectLines(potShown.owned.item).join(" ") : ""
 
-  const hiddenFor = (item: Shown) => effectHidden(effects, item)
-  // Les effets du plat : ceux des ingrédients débloqués ; « Effet inconnu » pour chacun des autres.
+  const hiddenFor = (item: Shown) => effectHidden(eraser, item.owned)
+  // Les effets du plat : ceux des ingrédients montrés ; « Effet inconnu » pour chacun des autres.
   const fxOf = (keys: string[]): EffectLine[] => [...new Set(keys)].flatMap((key) => {
     const item = shownOf(key, owned, catalog)
     if (!item?.owned) return []
@@ -172,7 +172,7 @@ export function CuisineWindow({ eraser, characterId }: ExtensionDialogProps<{ ch
     const v = values(item.key)
     const hidden = hiddenFor(item)
     const tip = <ItemTip title={item.name} lines={[`Cru ${v.raw} · cuit ${v.cooked} · ${v.portions} portion${v.portions > 1 ? "s" : ""}`]} effect={item.owned ? effectLines(item.owned.item) : undefined} locked={hidden}>{children}</ItemTip>
-    return <LockMenu name={item.name} lockable={Boolean(item.owned) && effectLockable(effects, item)} hidden={hidden} onToggle={() => toggleEffect(item.name, hidden)}>{tip}</LockMenu>
+    return <LockMenu name={item.name} lockable={Boolean(item.owned)} hidden={hidden} onToggle={() => { if (item.owned) toggleEffect(item.owned, hidden) }}>{tip}</LockMenu>
   }
 
   const missing = (itemName: string) => !owned.some((item) => item.key === fold(itemName))

@@ -1,17 +1,15 @@
-# Eraser Craft 0.1.0 — La Cuisine et l'Alchimie
+# Eraser Craft 0.1.1 — Les effets derrière l'œil
 
-- **Le coin Craft** apparaît à côté de la bourse de chaque personnage. La Cuisine et l'Alchimie
-  s'ouvrent ; les autres ateliers suivront.
-- **Cuisine** : choisis tes ingrédients (crus ou cuits) et un contenant, ou aucun. Le plat créé a
-  ses portions, à manger une à une depuis l'inventaire : chacune remplit la barre de rassasiement.
-  La conservation vient de l'effet du contenant, qui s'ajoute au recyclage du plat.
-- **Alchimie** : une base, des ingrédients, un récipient. La base donne la famille (potion, venin,
-  onguent, gaz), le récipient le nombre de doses.
-- Le résultat du test se choisit à la fin (réussite, échec, critiques) : les dés restent à la table.
-- **Carnets** de recettes et de formules : les créations réussies s'y ajoutent, on peut aussi
-  noter une recette sans cuisiner. Recherche, favoris, renommer et supprimer au clic droit.
-- Les effets cachés des ingrédients se débloquent au clic droit, comme dans l'inventaire.
-- **Réglages** (administrateurs) : la roue crantée de l'extension, dans Administration ›
-  Extensions, choisit l'index, les colonnes (Nutrition, portions, doses, famille) et les types
-  d'items de chaque atelier.
-- Demande Eraser 0.1.1-alpha.290 ou plus récent.
+- L'effet d'un ingrédient est **caché d'office**, comme dans l'inventaire. Clic droit dans
+  l'atelier : « Voir l'effet » (ou « Cacher l'effet »). C'est le même œil que dans l'inventaire :
+  un effet montré dans l'atelier l'est aussi dans l'inventaire, et l'inverse.
+- Un plat ou une potion garde l'effet de chaque ingrédient ; dans l'inventaire, il est derrière
+  l'œil comme les autres.
+- Demande Eraser 0.1.1-alpha.294 ou plus récent.
+
+## Rappel de la 0.1.0
+
+- Le coin Craft à côté de la bourse : la **Cuisine** (ingrédients crus ou cuits, contenant ou
+  aucun, plat à portions) et l'**Alchimie** (base, ingrédients, récipient, doses).
+- Le résultat du test se choisit à la fin ; carnets de recettes et de formules.
+- Réglages des ateliers derrière la roue crantée, dans Administration › Extensions.

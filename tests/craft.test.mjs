@@ -95,7 +95,7 @@ test("la partie serveur garde les carnets et la création en cours de chaque per
 
 test("Eraser pose les emplacements dont l'extension a besoin", async () => {
   const { extensionSlots, EXTENSION_API_VERSION } = await loadEraser("/lib/extensions.ts")
-  assert.ok(EXTENSION_API_VERSION >= 4)
+  assert.ok(EXTENSION_API_VERSION >= 5)
   assert.ok("inventaire.bourse" in extensionSlots)
   assert.ok("administration.extension" in extensionSlots)
 })

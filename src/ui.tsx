@@ -1,9 +1,9 @@
 /**
  * Les pièces communes aux fenêtres des ateliers : icône d'item, résultat du test, carnet (recherche,
- * favoris, renommer et supprimer au clic droit), infobulle d'un item, menu des effets cachés.
+ * favoris, renommer et supprimer au clic droit), infobulle d'un item, menu de l'œil des effets.
  */
 import { useState, type ReactNode } from "react"
-import { BookMarked, BookPlus, Lock, Pencil, Search, Star, Trash2 } from "lucide-react"
+import { BookPlus, Eye, EyeOff, Pencil, Search, Star, Trash2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuLabel, ContextMenuSeparator, ContextMenuTrigger } from "@/components/ui/context-menu"
@@ -51,32 +51,33 @@ export function OutcomeAsk({ choices, onPick }: { choices: Array<[OutcomeKey, st
   </div>
 }
 
-/** L'infobulle d'un item : son nom, ce qu'il apporte, son effet (ou « Effet verrouillé »). */
+/** L'infobulle d'un item : son nom, ce qu'il apporte, son effet (ou « Effet caché »). */
 export function ItemTip({ children, title, lines, effect, locked }: { children: ReactNode; title: string; lines?: string[]; effect?: string[]; locked?: boolean }) {
   return <Tooltip delayDuration={250}>
     <TooltipTrigger asChild>{children}</TooltipTrigger>
     <TooltipContent side="right" className="grid max-w-[250px] gap-0.5 border bg-card px-3 py-2.5 text-xs text-muted-foreground shadow-lg [&>svg]:hidden">
       <span className="font-display text-[15px] font-semibold text-foreground">{title}</span>
       {lines?.map((line) => <span key={line} className="text-foreground">{line}</span>)}
-      {effect && <span className={cn("mt-1 border-t pt-1.5 text-foreground", locked && "italic text-muted-foreground")}>{locked ? "Effet verrouillé" : effect.length ? effect.map((line, index) => <span key={index} className="block">{line}</span>) : "Aucun effet"}</span>}
+      {effect && <span className={cn("mt-1 border-t pt-1.5 text-foreground", locked && "italic text-muted-foreground")}>{locked ? "Effet caché" : effect.length ? effect.map((line, index) => <span key={index} className="block">{line}</span>) : "Aucun effet"}</span>}
     </TooltipContent>
   </Tooltip>
 }
 
-/** Le clic droit d'un ingrédient : débloquer ou reverrouiller son effet (le même réglage que dans l'inventaire). */
+/** Le clic droit d'un ingrédient : voir ou cacher son effet (l'œil de l'inventaire, le même réglage). */
 export function LockMenu({ children, name, lockable, hidden, onToggle }: { children: ReactNode; name: string; lockable: boolean; hidden: boolean; onToggle: () => void }) {
   if (!lockable) return <>{children}</>
   return <ContextMenu>
-    <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
+    {/* Un vrai élément sous le clic droit : l'infobulle, elle, n'en rend pas. */}
+    <ContextMenuTrigger asChild><span className="block">{children}</span></ContextMenuTrigger>
     <ContextMenuContent className="min-w-48">
       <ContextMenuLabel className="max-w-60 truncate text-xs text-muted-foreground">{name}</ContextMenuLabel>
       <ContextMenuSeparator />
-      <ContextMenuItem onSelect={onToggle}>{hidden ? <><BookMarked />Débloquer l'effet</> : <><Lock />Reverrouiller l'effet</>}</ContextMenuItem>
+      <ContextMenuItem onSelect={onToggle}>{hidden ? <><Eye />Voir l'effet</> : <><EyeOff />Cacher l'effet</>}</ContextMenuItem>
     </ContextMenuContent>
   </ContextMenu>
 }
 
-/** Une ligne d'effet du résultat ; « Effet inconnu » quand elle est verrouillée. */
+/** Une ligne d'effet du résultat ; « Effet inconnu » quand elle est cachée. */
 export type EffectLine = { text: string; locked?: boolean; sign?: "+" | "-" }
 
 export function EffectList({ lines, accent }: { lines: EffectLine[]; accent: string }) {
