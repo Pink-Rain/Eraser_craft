@@ -3,7 +3,8 @@
 Extension d'[Eraser](https://github.com/Pink-Rain/Eraser) : les ateliers de fabrication des personnages.
 Elle s'ouvre en fenêtre par-dessus la fiche du personnage, depuis le coin « Craft » de l'onglet Inventaire.
 
-> **État : en conception.** Les fenêtres sont dessinées et validées sur maquette ; le code n'est pas encore écrit.
+> **État : Cuisine et Alchimie disponibles.** Le Maquillage, la Couture, l'Artisanat et l'Œuvrerie sont
+> dessinés et validés sur maquette ; ils viendront ensuite.
 
 ## Les ateliers
 
@@ -32,21 +33,25 @@ Elle s'ouvre en fenêtre par-dessus la fiche du personnage, depuis le coin « Cr
 
 ## Comment l'extension se branche sur Eraser
 
-- C'est une extension de l'**API 3** d'Eraser : un module de démarrage (`boot`, `activate(eraser)`) qui pose
-  ses composants dans les emplacements d'Eraser et ouvre ses fenêtres avec `eraser.ui.dialog`.
+- C'est une extension de l'**API 4** d'Eraser : un module de démarrage (`boot`, `activate(eraser)`) qui pose
+  le coin Craft dans l'emplacement `inventaire.bourse` et sa roue de réglages dans
+  `administration.extension`, puis ouvre ses fenêtres avec `eraser.ui.dialog`.
 - Elle lit et modifie l'inventaire **uniquement par les API d'Eraser** (`eraser.eraser("/api/…")`), qui
-  vérifient les droits. Elle n'appelle jamais Google elle-même.
-- Ses propres données (carnets, teintes découvertes, effets débloqués, créations en cours) sont gardées sur
-  le serveur partagé, dans la portée `extension:craft`.
-- Une création se fait en deux temps : d'abord le nouvel item, ensuite le retrait des items utilisés. Une
-  note « création en cours » permet de terminer ou d'annuler proprement si Eraser se ferme au milieu.
+  vérifient les droits, et prévient la fiche avec `eraser.inventory.changed`. Elle n'appelle jamais
+  Google elle-même : sa partie serveur lit les index par `eraser.indexes`, et n'en sert aux joueurs
+  que les colonnes réglées.
+- Ses propres données (réglages, carnets, créations en cours) sont gardées sur le serveur partagé, dans
+  la portée `extension:craft`. Les effets débloqués sont ceux d'Eraser, partagés avec l'inventaire.
+- Une création se fait en deux temps : d'abord le nouvel item, ensuite le retrait des items utilisés
+  (avec la quantité vue : rien n'est retiré à tort si l'inventaire a changé). Une note « création en
+  cours » permet de terminer ou d'oublier proprement si Eraser se ferme au milieu.
 
-### Ce qu'il manque encore côté Eraser
+## Réglages
 
-- Un **emplacement** dans l'inventaire du personnage, là où se trouve le coin Craft, qui donne le
-  personnage, sa campagne et si on peut le modifier.
-- Un **signal** pour dire à la fiche de relire l'inventaire après une création.
-- La **liaison** de cette extension dans `linkedExtensions` (`lib/extensions.ts`), avec l'identifiant `craft`.
+Derrière la roue crantée de l'extension (Administration › Extensions, administrateurs) : pour chaque
+atelier, l'index où lire les items, les colonnes (Nutrition crue et cuite, portions ; famille d'une base,
+doses d'un récipient) et les types d'items reconnus (ingrédients, contenants, bases, récipients). Les
+colonnes se créent dans Google Sheets sous le nom qu'on veut, puis se choisissent ici.
 
 ## Publier
 
