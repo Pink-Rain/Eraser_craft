@@ -1,11 +1,8 @@
 # Eraser Craft 0.1.2 — Les ateliers reconnaissent les items de l'Index
 
-- Un item est reconnu par sa colonne **Type**, son **Sous-type** ou son **Genre** : il suffit
-  que l'un d'eux porte un des types réglés derrière la roue crantée.
-- Une case peut porter **plusieurs types**, séparés par des virgules
-  (« Composant, Ingrédient, Champignon ») : chacun compte.
-- Majuscules, accents et pluriel ne comptent pas (« Ingrédients » = « ingrédient »).
-- Les en-têtes « Catégorie » et « Sous type » sont lus comme le fait Eraser.
+- La colonne **Type** d'un item peut porter plusieurs étiquettes, séparées par des virgules
+  (« Composant, Ingrédient, Champignon ») : l'item est reconnu si l'une d'elles est parmi les
+  types réglés derrière la roue crantée.
 - Demande Eraser 0.1.1-alpha.294 ou plus récent.
 
 ## Rappel de la 0.1.1
