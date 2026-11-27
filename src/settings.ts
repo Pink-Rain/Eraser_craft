@@ -116,7 +116,7 @@ export function fold(value: string) {
 }
 
 /** Les valeurs que le catalogue donne en plus des colonnes réglées (noms qu'aucune colonne ne porte). */
-export const META = { name: "__nom", type: "__type", subtype: "__sous-type", icon: "__icone" } as const
+export const META = { name: "__nom", type: "__type", subtype: "__sous-type", genre: "__genre", icon: "__icone" } as const
 
 /** Ce que l'atelier sait d'un item de son index : nom replié → colonne → valeur (et `META`). */
 export type AtelierCatalog = Record<string, Record<string, string>>

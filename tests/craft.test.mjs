@@ -51,6 +51,7 @@ test("la partie serveur : réglages réservés aux administrateurs, catalogue li
     tabs: [
       { name: "Nourriture", headers: ["Nom", "Type", "Icône", "Nutrition cru", "Nutrition cuit", "Portions", "Prix secret"], rows: [["Viande grasse", "Ingrédient", "", "1", "3", "2", "99"], ["", "", "", "", "", "", ""]] },
       { name: "Divers", headers: ["Nom", "Type"], rows: [["Bol en bois", "Contenant"]] },
+      { name: "Items", headers: ["Nom", "Genre", "Catégorie", "Sous type"], rows: [["Cèpe des montagnes", "Ressource", "Composant, Ingrédient, Champignon", "Champignon"]] },
     ],
   }
   const indexes = { list: async () => [{ key: "objects", title: "Index des items", tabs: index.tabs.map((tab) => ({ name: tab.name, columns: tab.headers })) }], read: async (key) => key === "objects" ? index : null }
@@ -69,6 +70,10 @@ test("la partie serveur : réglages réservés aux administrateurs, catalogue li
   const catalog = (await (await server.fetch(new Request("http://x/"), { ...player.eraser, path: ["catalogue", "cuisine"] })).json()).catalog
   assert.deepEqual(catalog["viande grasse"], { "__nom": "Viande grasse", "__type": "Ingrédient", "__icone": "", "Nutrition cru": "1", "Nutrition cuit": "3", "Portions": "2" })
   assert.equal(catalog["bol en bois"]["__type"], "Contenant")
+  // Les en-têtes qu'Eraser accepte aussi : Catégorie, Sous type, Genre.
+  assert.equal(catalog["cepe des montagnes"]["__type"], "Composant, Ingrédient, Champignon")
+  assert.equal(catalog["cepe des montagnes"]["__sous-type"], "Champignon")
+  assert.equal(catalog["cepe des montagnes"]["__genre"], "Ressource")
   assert.ok(!JSON.stringify(catalog).includes("Prix secret"), "une colonne non réglée ne sort pas")
 
   const older = fakeEraser({ path: ["catalogue", "cuisine"] })
@@ -122,6 +127,14 @@ test("un nombre écrit dans une case, et les types reconnus sans accents ni cass
   assert.equal(numberIn("-4"), 0)
   assert.ok(hasType({ type: "ingredient" }, ["Ingrédient"]))
   assert.ok(!hasType({ type: "" }, ["Ingrédient"]))
+  // Plusieurs types dans la case, le sous-type, le genre, le pluriel : comme l'Index des items les écrit.
+  assert.ok(hasType({ type: "Composant, Ingrédient, Champignon" }, ["Ingrédient"]))
+  assert.ok(hasType({ type: "Objet ", subtype: "Contenant" }, ["Contenant"]))
+  assert.ok(hasType({ type: "Consommable", subtype: "Base" }, ["Base"]))
+  assert.ok(hasType({ type: "Nature", genre: "Ressource" }, ["Ressources"]))
+  assert.ok(hasType({ type: "Ingrédients" }, ["ingredient"]))
+  assert.ok(!hasType({ type: "Composant, Champignon" }, ["Ingrédient"]))
+  assert.ok(!hasType({ type: "Ingrédient de cuisine" }, ["Ingrédient"]))
   const owned = [{ key: "viande", name: "Viande", quantity: 3, slots: [{ slot: { id: "a", itemId: "v", quantity: 1 } }, { slot: { id: "b", itemId: "v", quantity: 2 } }] }]
   assert.deepEqual(plannedTakes(owned, new Map([["viande", 2]])), [
     { slotId: "a", itemId: "v", name: "Viande", quantity: 1, count: 1 },

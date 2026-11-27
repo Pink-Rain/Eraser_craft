@@ -17,7 +17,7 @@ import type { ExtensionDialogProps } from "@/lib/extension-api"
 
 import { AtelierLoading, Destination, PendingBanner, useAtelier } from "./atelier"
 import { newRecipeId, type CuisineRecipe } from "./book"
-import { CraftError, craft, effectHidden, effectLines, hasType, numberIn, ownedItems, plannedTakes, type OwnedItem } from "./inventory"
+import { CraftError, catalogTypes, craft, effectHidden, effectLines, hasType, numberIn, ownedItems, plannedTakes, type OwnedItem } from "./inventory"
 import { META, fold, type AtelierCatalog } from "./settings"
 import { BookStrip, EffectList, ItemIcon, ItemRow, ItemTip, Label, LockMenu, Notice, OutcomeAsk, Segmented, colors, type EffectLine, type OutcomeKey } from "./ui"
 
@@ -55,20 +55,17 @@ export function CuisineWindow({ eraser, characterId }: ExtensionDialogProps<{ ch
   const { settings: { cuisine: settings }, catalog } = data
   const owned = ownedItems(data.inventory)
   const cook = mode === "cook"
-  const isIngredientType = (type: string) => hasType({ type }, settings.ingredientTypes)
-  const isContainerType = (type: string) => hasType({ type }, settings.containerTypes)
-
   // Les listes : ce que le personnage a ; pour noter une recette, aussi ce que l'index connaît.
-  const listOf = (accepts: (type: string) => boolean) => {
-    const mine = owned.filter((item) => accepts(item.item.type)).map((item) => shownOf(item.key, owned, catalog)!)
+  const listOf = (types: string[]) => {
+    const mine = owned.filter((item) => hasType(item.item, types)).map((item) => shownOf(item.key, owned, catalog)!)
     if (cook) return mine
     const known = new Set(mine.map((item) => item.key))
-    const others = Object.keys(catalog).filter((key) => !known.has(key) && accepts(catalog[key][META.type] || "")).map((key) => shownOf(key, owned, catalog)!).sort((a, b) => a.name.localeCompare(b.name, "fr"))
+    const others = Object.keys(catalog).filter((key) => !known.has(key) && hasType(catalogTypes(catalog[key]), types)).map((key) => shownOf(key, owned, catalog)!).sort((a, b) => a.name.localeCompare(b.name, "fr"))
     return [...mine, ...others]
   }
   const folded = fold(query)
-  const ingredients = listOf(isIngredientType).filter((item) => !folded || fold(item.name).includes(folded))
-  const containers = listOf(isContainerType)
+  const ingredients = listOf(settings.ingredientTypes).filter((item) => !folded || fold(item.name).includes(folded))
+  const containers = listOf(settings.containerTypes)
 
   const used = (key: string) => lines.filter((line) => line.key === key).length
   const left = (key: string) => (owned.find((item) => item.key === key)?.quantity ?? 0) - used(key)

@@ -70,6 +70,7 @@ export function SettingsWindow({ eraser, close }: ExtensionDialogProps) {
 
   return <div className="grid gap-4">
     {error && <Notice tone="erreur" onClose={() => setError("")}>{error}</Notice>}
+    <p className="text-sm text-muted-foreground">Un item est reconnu si son type, son sous-type ou son genre porte l'un des types indiqués (une case de l'index peut en porter plusieurs, séparés par des virgules).</p>
     <Section icon={<CookingPot className="size-4" />} color={colors.cuisine} title="Cuisine">
       <Field label="Index des ingrédients">{indexSelect(cuisine.index, (index) => setCuisine({ index }))}</Field>
       <Field label="Colonne du nom">{columnSelect(cuisine.index, cuisine.nameColumn, (nameColumn) => setCuisine({ nameColumn }), false)}</Field>

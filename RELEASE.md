@@ -1,11 +1,17 @@
-# Eraser Craft 0.1.1 — Les effets derrière l'œil
+# Eraser Craft 0.1.2 — Les ateliers reconnaissent les items de l'Index
 
-- L'effet d'un ingrédient est **caché d'office**, comme dans l'inventaire. Clic droit dans
-  l'atelier : « Voir l'effet » (ou « Cacher l'effet »). C'est le même œil que dans l'inventaire :
-  un effet montré dans l'atelier l'est aussi dans l'inventaire, et l'inverse.
-- Un plat ou une potion garde l'effet de chaque ingrédient ; dans l'inventaire, il est derrière
-  l'œil comme les autres.
+- Un item est reconnu par sa colonne **Type**, son **Sous-type** ou son **Genre** : il suffit
+  que l'un d'eux porte un des types réglés derrière la roue crantée.
+- Une case peut porter **plusieurs types**, séparés par des virgules
+  (« Composant, Ingrédient, Champignon ») : chacun compte.
+- Majuscules, accents et pluriel ne comptent pas (« Ingrédients » = « ingrédient »).
+- Les en-têtes « Catégorie » et « Sous type » sont lus comme le fait Eraser.
 - Demande Eraser 0.1.1-alpha.294 ou plus récent.
+
+## Rappel de la 0.1.1
+
+- L'effet d'un ingrédient est caché d'office, derrière le même œil que l'inventaire (clic droit
+  dans l'atelier : « Voir l'effet » / « Cacher l'effet »).
 
 ## Rappel de la 0.1.0
 

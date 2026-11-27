@@ -11,7 +11,7 @@ import type { Eraser } from "@/lib/extension-api"
 import type { CharacterInventoryRecord, InventoryContainerRecord, InventoryItemRecord, InventorySlotRecord, InventoryTransferTarget } from "@/lib/inventory-schema"
 
 import type { PendingCreation, PendingTake } from "./book"
-import { fold, type Atelier, type AtelierCatalog, type CraftSettings } from "./settings"
+import { META, fold, type Atelier, type AtelierCatalog, type CraftSettings } from "./settings"
 
 /** Un item que le personnage a sur lui, toutes cases confondues (même nom). */
 export type OwnedItem = {
@@ -65,10 +65,28 @@ export function ownedItems(inventory: CharacterInventoryRecord): OwnedItem[] {
   return [...byName.values()].sort((a, b) => a.name.localeCompare(b.name, "fr"))
 }
 
-export const hasType = (item: { type: string }, types: string[]) => {
-  const type = fold(item.type || "")
-  return Boolean(type) && types.some((candidate) => fold(candidate) === type)
+/** Un mot de type replié, au singulier (« Ingrédients » → « ingredient »). */
+const typeWord = (value: string) => {
+  const word = fold(value)
+  return word.length > 3 && /[sx]$/.test(word) ? word.slice(0, -1) : word
 }
+
+/**
+ * Les types d'un item, tels que l'Index des items les écrit : sa colonne Type, son Sous-type et
+ * son Genre, chacun pouvant en porter plusieurs (« Composant, Ingrédient, Champignon »).
+ */
+export function typeWords(item: { type?: string; subtype?: string; genre?: string }): Set<string> {
+  return new Set([item.type, item.subtype, item.genre].flatMap((value) => (value ?? "").split(/[,;/|]/)).map(typeWord).filter(Boolean))
+}
+
+/** L'item porte-t-il l'un de ces types (dans son Type, son Sous-type ou son Genre) ? */
+export const hasType = (item: { type?: string; subtype?: string; genre?: string }, types: string[]) => {
+  const words = typeWords(item)
+  return words.size > 0 && types.some((candidate) => words.has(typeWord(candidate)))
+}
+
+/** Ce que l'index dit des types d'un item que le personnage n'a pas (noter une recette). */
+export const catalogTypes = (row: Record<string, string> | undefined) => ({ type: row?.[META.type] ?? "", subtype: row?.[META.subtype] ?? "", genre: row?.[META.genre] ?? "" })
 
 /** Le texte d'un effet, sans sa mise en forme. */
 export function plainText(value: string) {

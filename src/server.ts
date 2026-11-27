@@ -59,7 +59,10 @@ function catalogOf(eraser: ServerEraser, index: string, nameColumn: string, colu
       if (nameAt < 0) continue
       const at = columns.map((column) => [column, headers.indexOf(fold(column))] as const).filter(([, position]) => position >= 0)
       // Ce qui sert à montrer l'item quand le personnage ne l'a pas (noter une recette) : son type et son icône.
-      const meta = ([[META.type, "type"], [META.subtype, "sous-type"], [META.icon, "icone"]] as const).map(([key, header]) => [key, headers.indexOf(header)] as const).filter(([, position]) => position >= 0)
+      // Les mêmes en-têtes qu'Eraser accepte pour l'Index des items (« Catégorie », « Sous type »…).
+      const meta = ([[META.type, ["type", "categorie"]], [META.subtype, ["sous-type", "sous type", "subtype"]], [META.genre, ["genre"]], [META.icon, ["icone", "icon"]]] as const)
+        .map(([key, aliases]) => [key, aliases.map((alias) => headers.indexOf(alias)).find((position) => position >= 0) ?? -1] as const)
+        .filter(([, position]) => position >= 0)
       for (const row of tab.rows) {
         const name = fold(row[nameAt] ?? "")
         if (!name || catalog[name]) continue
