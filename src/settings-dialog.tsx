@@ -70,10 +70,10 @@ export function SettingsWindow({ eraser, close }: ExtensionDialogProps) {
 
   return <div className="grid gap-4">
     {error && <Notice tone="erreur" onClose={() => setError("")}>{error}</Notice>}
-    <p className="text-sm text-muted-foreground">Un item est reconnu si l'une des étiquettes de sa colonne Type (séparées par des virgules) est parmi les types indiqués.</p>
     <Section icon={<CookingPot className="size-4" />} color={colors.cuisine} title="Cuisine">
       <Field label="Index des ingrédients">{indexSelect(cuisine.index, (index) => setCuisine({ index }))}</Field>
       <Field label="Colonne du nom">{columnSelect(cuisine.index, cuisine.nameColumn, (nameColumn) => setCuisine({ nameColumn }), false)}</Field>
+      <Field label="Colonne des types">{columnSelect(cuisine.index, cuisine.typeColumn, (typeColumn) => setCuisine({ typeColumn }), false)}</Field>
       <Field label="Nutrition crue">{columnSelect(cuisine.index, cuisine.rawColumn, (rawColumn) => setCuisine({ rawColumn }))}</Field>
       <Field label="Nutrition cuite">{columnSelect(cuisine.index, cuisine.cookedColumn, (cookedColumn) => setCuisine({ cookedColumn }))}</Field>
       <Field label="Portions">{columnSelect(cuisine.index, cuisine.portionsColumn, (portionsColumn) => setCuisine({ portionsColumn }))}</Field>
@@ -84,6 +84,7 @@ export function SettingsWindow({ eraser, close }: ExtensionDialogProps) {
     <Section icon={<FlaskConical className="size-4" />} color={colors.alchimie} title="Alchimie">
       <Field label="Index des items">{indexSelect(alchimie.index, (index) => setAlchimie({ index }))}</Field>
       <Field label="Colonne du nom">{columnSelect(alchimie.index, alchimie.nameColumn, (nameColumn) => setAlchimie({ nameColumn }), false)}</Field>
+      <Field label="Colonne des types">{columnSelect(alchimie.index, alchimie.typeColumn, (typeColumn) => setAlchimie({ typeColumn }), false)}</Field>
       <Field label="Famille d'une base">{columnSelect(alchimie.index, alchimie.familyColumn, (familyColumn) => setAlchimie({ familyColumn }))}</Field>
       <Field label="Doses d'un récipient">{columnSelect(alchimie.index, alchimie.dosesColumn, (dosesColumn) => setAlchimie({ dosesColumn }))}</Field>
       <Field label="Types des bases">{typesInput(alchimie.baseTypes, (baseTypes) => setAlchimie({ baseTypes }), "Base")}</Field>

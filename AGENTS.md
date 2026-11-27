@@ -21,8 +21,9 @@ l'`ARCHITECTURE.md` d'Eraser ; elle demande l'**API 5**.
 - `src/settings.ts`, `src/book.ts` : modules communs (aucun import), vérifiés côté serveur.
 - **Rien n'est écrit en dur** : index, colonnes et types d'items se choisissent derrière la roue
   crantée (Administration › Extensions). Une nouvelle colonne nécessaire = un nouveau réglage.
-- Un item est reconnu par sa colonne Type, et elle seule : une de ses étiquettes (séparées par
-  des virgules) doit être parmi les types réglés pour l'atelier (`hasType`, `src/inventory.ts`).
+- La colonne où lire les étiquettes d'un item est un réglage de chaque atelier (« Colonne des
+  types ») ; une de ses étiquettes (séparées par des virgules) doit être parmi les types réglés
+  (`hasType`, `src/inventory.ts`).
 
 ## Règles des ateliers
 

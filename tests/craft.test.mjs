@@ -15,6 +15,8 @@ test("des réglages incomplets ou abîmés reprennent leurs valeurs d'origine", 
   assert.deepEqual(settings.cuisine.ingredientTypes, ["Légume"])
   assert.equal(settings.cuisine.cookedColumn, defaultSettings.cuisine.cookedColumn)
   assert.equal(settings.alchimie.index, "objects")
+  assert.equal(settings.cuisine.typeColumn, "Type")
+  assert.equal(normalizeSettings({ alchimie: { typeColumn: " Étiquettes " } }).alchimie.typeColumn, "Étiquettes")
 })
 
 test("un carnet ne garde que des recettes complètes", async () => {
@@ -67,9 +69,15 @@ test("la partie serveur : réglages réservés aux administrateurs, catalogue li
   assert.equal(listed.indexes[0].key, "objects")
 
   const catalog = (await (await server.fetch(new Request("http://x/"), { ...player.eraser, path: ["catalogue", "cuisine"] })).json()).catalog
-  assert.deepEqual(catalog["viande grasse"], { "__nom": "Viande grasse", "__type": "Ingrédient", "__icone": "", "Nutrition cru": "1", "Nutrition cuit": "3", "Portions": "2" })
+  assert.deepEqual(catalog["viande grasse"], { "__nom": "Viande grasse", "__type": "Ingrédient", "__icone": "", "Type": "Ingrédient", "Nutrition cru": "1", "Nutrition cuit": "3", "Portions": "2" })
   assert.equal(catalog["bol en bois"]["__type"], "Contenant")
   assert.ok(!JSON.stringify(catalog).includes("Prix secret"), "une colonne non réglée ne sort pas")
+
+  // La colonne des types est un réglage : le catalogue donne celle qui est choisie.
+  await server.fetch(new Request("http://x/", { method: "PUT", body: JSON.stringify({ cuisine: { typeColumn: "Prix secret" } }) }), admin.eraser)
+  const retagged = (await (await server.fetch(new Request("http://x/"), { ...admin.eraser, path: ["catalogue", "cuisine"] })).json()).catalog
+  assert.equal(retagged["viande grasse"]["Prix secret"], "99")
+  assert.equal(retagged["viande grasse"]["Type"], undefined)
 
   const older = fakeEraser({ path: ["catalogue", "cuisine"] })
   assert.equal((await server.fetch(new Request("http://x/"), older.eraser)).status, 409)

@@ -82,11 +82,13 @@ export function AlchimieWindow({ eraser, characterId }: ExtensionDialogProps<{ c
   const owned = ownedItems(data.inventory)
   const brew = mode === "brew"
 
+  // Les étiquettes d'un item : la colonne des types réglée, dans l'index de l'atelier.
+  const tagsOf = (key: string) => ({ type: catalog[key]?.[settings.typeColumn] ?? "" })
   const listOf = (types: string[]) => {
-    const mine = owned.filter((item) => hasType(item.item, types)).map((item) => shownOf(item.key, owned, catalog)!)
+    const mine = owned.filter((item) => hasType(tagsOf(item.key), types)).map((item) => shownOf(item.key, owned, catalog)!)
     if (brew) return mine
     const known = new Set(mine.map((item) => item.key))
-    return [...mine, ...Object.keys(catalog).filter((key) => !known.has(key) && hasType({ type: catalog[key][META.type] || "" }, types)).map((key) => shownOf(key, owned, catalog)!).sort((a, b) => a.name.localeCompare(b.name, "fr"))]
+    return [...mine, ...Object.keys(catalog).filter((key) => !known.has(key) && hasType(tagsOf(key), types)).map((key) => shownOf(key, owned, catalog)!).sort((a, b) => a.name.localeCompare(b.name, "fr"))]
   }
   const folded = fold(query)
   const lists = { base: listOf(settings.baseTypes), ing: listOf(settings.ingredientTypes), pot: listOf(settings.vesselTypes) }

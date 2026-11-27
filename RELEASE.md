@@ -1,6 +1,7 @@
 # Eraser Craft 0.1.2 — Les ateliers reconnaissent les items de l'Index
 
-- La colonne **Type** d'un item peut porter plusieurs étiquettes, séparées par des virgules
+- Nouveau réglage par atelier : la **Colonne des types**, où lire les étiquettes d'un item
+  (« Type » au départ). Elle peut porter plusieurs étiquettes, séparées par des virgules
   (« Composant, Ingrédient, Champignon ») : l'item est reconnu si l'une d'elles est parmi les
   types réglés derrière la roue crantée.
 - Demande Eraser 0.1.1-alpha.294 ou plus récent.

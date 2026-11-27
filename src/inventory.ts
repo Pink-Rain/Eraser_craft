@@ -66,9 +66,8 @@ export function ownedItems(inventory: CharacterInventoryRecord): OwnedItem[] {
 }
 
 /**
- * La colonne Type d'un item peut porter plusieurs étiquettes, séparées par des virgules
- * (« Composant, Ingrédient, Champignon ») : il suffit que l'une d'elles soit parmi les types
- * réglés pour l'atelier (roue crantée).
+ * Les étiquettes d'un item (lues dans la colonne des types réglée pour l'atelier) peuvent être
+ * plusieurs, séparées par des virgules : il suffit que l'une d'elles soit parmi les types réglés.
  */
 export const hasType = (item: { type: string }, types: string[]) => {
   const tags = new Set((item.type || "").split(",").map(fold).filter(Boolean))

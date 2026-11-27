@@ -12,6 +12,8 @@ export type CuisineSettings = {
   index: string
   /** La colonne du nom de l'item, pour retrouver sa ligne. */
   nameColumn: string
+  /** La colonne où lire les étiquettes d'un item (plusieurs, séparées par des virgules). */
+  typeColumn: string
   /** La Nutrition d'un ingrédient pris cru, et pris cuit. */
   rawColumn: string
   cookedColumn: string
@@ -28,6 +30,7 @@ export type CuisineSettings = {
 export type AlchimieSettings = {
   index: string
   nameColumn: string
+  typeColumn: string
   /** La famille d'une base (Potion · Ingestion, Venin · Blessure…). */
   familyColumn: string
   /** Combien de doses donne un récipient. */
@@ -45,6 +48,7 @@ export const defaultSettings: CraftSettings = {
   cuisine: {
     index: "objects",
     nameColumn: "Nom",
+    typeColumn: "Type",
     rawColumn: "Nutrition cru",
     cookedColumn: "Nutrition cuit",
     portionsColumn: "Portions",
@@ -56,6 +60,7 @@ export const defaultSettings: CraftSettings = {
   alchimie: {
     index: "objects",
     nameColumn: "Nom",
+    typeColumn: "Type",
     familyColumn: "Famille",
     dosesColumn: "Doses",
     baseTypes: ["Base"],
@@ -81,6 +86,7 @@ export function normalizeSettings(value: unknown): CraftSettings {
     cuisine: {
       index: text(cuisine.index, c.index) || c.index,
       nameColumn: text(cuisine.nameColumn, c.nameColumn) || c.nameColumn,
+      typeColumn: text(cuisine.typeColumn, c.typeColumn) || c.typeColumn,
       rawColumn: text(cuisine.rawColumn, c.rawColumn),
       cookedColumn: text(cuisine.cookedColumn, c.cookedColumn),
       portionsColumn: text(cuisine.portionsColumn, c.portionsColumn),
@@ -92,6 +98,7 @@ export function normalizeSettings(value: unknown): CraftSettings {
     alchimie: {
       index: text(alchimie.index, a.index) || a.index,
       nameColumn: text(alchimie.nameColumn, a.nameColumn) || a.nameColumn,
+      typeColumn: text(alchimie.typeColumn, a.typeColumn) || a.typeColumn,
       familyColumn: text(alchimie.familyColumn, a.familyColumn),
       dosesColumn: text(alchimie.dosesColumn, a.dosesColumn),
       baseTypes: list(alchimie.baseTypes, a.baseTypes),
@@ -106,8 +113,8 @@ export type Atelier = keyof CraftSettings
 
 /** Les colonnes qu'un atelier lit dans son index (en plus du nom). */
 export function atelierColumns(settings: CraftSettings, atelier: Atelier): string[] {
-  if (atelier === "cuisine") return [settings.cuisine.rawColumn, settings.cuisine.cookedColumn, settings.cuisine.portionsColumn].filter(Boolean)
-  return [settings.alchimie.familyColumn, settings.alchimie.dosesColumn].filter(Boolean)
+  if (atelier === "cuisine") return [settings.cuisine.typeColumn, settings.cuisine.rawColumn, settings.cuisine.cookedColumn, settings.cuisine.portionsColumn].filter(Boolean)
+  return [settings.alchimie.typeColumn, settings.alchimie.familyColumn, settings.alchimie.dosesColumn].filter(Boolean)
 }
 
 /** Un nom comparé sans accents, casse ni espaces doubles. */
